@@ -1,0 +1,149 @@
+// Voice-Driven AI Shopping Agent
+// Multilingual shopping assistant with voice input, real-time product search,
+// and RAG-powered recommendations
+
+application "shop-ai" {
+
+  // === Environment Variables ===
+  // ElevenLabs for voice synthesis and recognition
+  env "ELEVENLABS_API_KEY" {
+    secret = true
+  }
+
+  env "ELEVENLABS_VOICE_ID" {
+    default = "21m00Tcm4TlvDq8ikWAM"
+  }
+
+  // Google Custom Search for e-commerce searches
+  env "GOOGLE_SEARCH_API_KEY" {
+    secret = true
+  }
+
+  env "GOOGLE_SEARCH_ENGINE_ID" {
+    secret = true
+  }
+
+  // E-commerce platform APIs
+  env "AMAZON_API_KEY" {
+    secret = true
+  }
+
+  env "FLIPKART_API_KEY" {
+    secret = true
+  }
+
+  env "CROMA_API_KEY" {
+    secret = true
+  }
+
+  // OpenAI for language understanding and RAG
+  env "OPENAI_API_KEY" {
+    secret = true
+  }
+
+  // Google Gemini for advanced AI features and RAG
+  env "GEMINI_API_KEY" {
+    secret = true
+  }
+
+  env "GEMINI_MODEL" {
+    default = "gemini-2.0-flash"
+  }
+
+  env "GEMINI_VISION_MODEL" {
+    default = "gemini-2.0-flash-vision"
+  }
+
+  // === Services ===
+  // Main HTTP API for chat and voice interactions
+  service "shopping-api" {
+    visibility = "public"
+    domain {
+      cname = "shop-ai"
+    }
+  }
+
+  // === MCP Services ===
+  // AI integration for product recommendations and RAG-powered advice
+  mcp_service "shopping-agent" {
+    visibility = "protected"
+  }
+
+  // Gemini-powered MCP service for advanced NLP and RAG
+  mcp_service "gemini-rag-agent" {
+    visibility = "protected"
+  }
+
+  // === Actors ===
+  // Product search and caching actor
+  actor "product-search-actor" {}
+
+  // Voice processing actor for async audio handling
+  actor "voice-processor" {}
+
+  // User preference and history actor
+  actor "user-preferences-actor" {}
+
+  // === Observers ===
+  // Event-driven handlers that react to data changes
+  // observer "file-processor" {
+  //   source {
+  //     bucket = "my-bucket"  // ONLY buckets, NOT smartbuckets
+  //     // Additional source configuration
+  //   }
+  // }
+
+  // observer "queue-processor" {
+  //   source {
+  //     queue = "my-queue"
+  //   }
+  // }
+
+  // === Storage ===
+  // SmartBucket for product data and reviews (AI-powered document store)
+  smartbucket "products-kb" {}
+
+  // KV Cache for fast product lookups
+  kv_cache "product-cache" {}
+
+  // KV Cache for user sessions
+  kv_cache "session-cache" {}
+
+  // Bucket for storing audio files
+  bucket "audio-uploads" {
+    visibility = "protected"
+  }
+
+  // === Databases ===
+  // SQL database for user profiles and search history
+  sql_database "app-db" {}
+
+  // SmartMemory for semantic context and user preferences
+  smartmemory "user-memory" {}
+
+  // === Message Queues ===
+  // Queue for async product search jobs
+  queue "search-queue" {}
+
+  // Queue for voice processing tasks
+  queue "voice-queue" {}
+
+  // === Tasks ===
+  // Refresh product prices daily
+  task "refresh_prices" {
+    type = "cron"
+    cron = "0 2 * * *"
+  }
+
+  // Update reviews and ratings every 6 hours
+  task "update_reviews" {
+    type = "cron"
+    cron = "0 0 * * *"
+  }
+
+  // Clean up old audio files daily
+  task "cleanup_audio" {
+    type = "cron"
+    cron = "0 3 * * *"
+  }
+}
